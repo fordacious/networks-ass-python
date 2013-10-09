@@ -12,7 +12,22 @@ class Routing(object):
         self.num_blocked = 0.0
 
     def run (self, workload):
-        pass
+        visited = {}
+        path = {}
+        candidates = set(self.topology.verticies)
+
+        while candidates:
+            min_node = None
+            for candidate in candidates:
+                if node in visited:
+                    if min_node is None:
+
+            # Updates the path.
+            for edge in self.topology.edges[min_vert]:
+                cost = current_cost + self.cost(min_vert, edge)
+                if edge not in visited or cost < visited[edge]:
+                    visited[edge] = weight
+                    path[edge]    = min_vert
 	
     def cost (self, from_vert, to_vert ):
         return self.topology.weights[(from_vert, to_vert)][0]
