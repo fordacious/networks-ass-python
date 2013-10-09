@@ -11,7 +11,7 @@ class Routing(object):
         self.num_vc_requests = 0.0
         self.num_blocked = 0.0
 
-    def run (self):
+    def run (self, workload):
         pass
 	
     def output (self):
