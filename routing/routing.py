@@ -14,6 +14,9 @@ class Routing(object):
     def run (self, workload):
         pass
 	
+    def cost (self, from_vert, to_vert ):
+        return self.topology.weights[(from_vert, to_vert)][0]
+
     def output (self):
         print 'total number of virtual circuit requests: {0}'.format(self.num_vc_requests)
         print 'number of successfully routed requests: {0}'.format(self.num_vc_requests - self.num_blocked)
