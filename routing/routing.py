@@ -17,10 +17,16 @@ class Routing(object):
         candidates = set(self.topology.verticies)
 
         while candidates:
-            min_node = None
+            min_vert = None
             for candidate in candidates:
-                if node in visited:
-                    if min_node is None:
+                if candidate in visited:
+                    if min_vert is None:
+                        min_vert = candidate
+                    elif visited[candidate] < visited[min_vert]:
+                        min_vert = candidate
+
+            if min_vert is None:
+                break
 
             # Updates the path.
             for edge in self.topology.edges[min_vert]:
