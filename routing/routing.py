@@ -21,6 +21,7 @@ class Routing(object):
             for candidate in candidates:
                 if node in visited:
                     if min_node is None:
+                        
 
             # Updates the path.
             for edge in self.topology.edges[min_vert]:
