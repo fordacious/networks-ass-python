@@ -17,9 +17,9 @@ class Routing(object):
     def output (self):
         print 'total number of virtual circuit requests: {0}'.format(self.num_vc_requests)
         print 'number of successfully routed requests: {0}'.format(self.num_vc_requests - self.num_blocked)
-        print 'percentage of successfully routed request: {0}'.format((self.num_vc_requests - self.num_blocked) * 100 / self.num_vc_requests)
+        print 'percentage of successfully routed request: {0}'.format(((self.num_vc_requests - self.num_blocked) * 100) / self.num_vc_requests)
         print 'number of blocked requests: {0}'.format(self.num_blocked)
-        print 'percentage of blocked requests: {0}'.format(self.num_blocked * 100 / self.num_vc_requests)
+        print 'percentage of blocked requests: {0}'.format((self.num_blocked * 100) / self.num_vc_requests)
 
 if __name__ == "__main__":
     routingSim = Routing(dict())
