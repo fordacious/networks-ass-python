@@ -28,49 +28,6 @@ class Routing(object):
                 self.num_blocked += 1
             
             current_work_unit = workload.next()
-        
-        '''
-        path = {}
-        candidates = []
-
-        source = []
-
-        # make tuple with cost
-        for candidate in self.topology.verticies:
-            candidates.append((candidate, INFINITY))
-
-        candidates.sort(lambda x, y : 1 if cost(x[0]) > cost(y[0]) else -1)
-
-<<<<<<< HEAD
-        while len(candidates):
-            # take min node and remove from candidates
-            min_node = candidates[0][0]
-            candidates = candidates[1:]
-
-            
-=======
-        while candidates:
-            min_vert = None
-            for candidate in candidates:
-                if candidate in visited:
-                    if min_vert is None:
-                        min_vert = candidate
-                    elif visited[candidate] < visited[min_vert]:
-                        min_vert = candidate
-
-            if min_vert is None:
-                break
->>>>>>> b53a1debfe0b55f287efed7372feb36d5b5fe3b1
-
-            # Updates the path.
-            for edge in self.topology.edges[min_vert]:
-                cost = current_cost + self.cost(min_vert, edge)
-                if edge not in visited or cost < visited[edge]:
-                    visited[edge] = weight
-                    path[edge]    = min_vert
-	
-        # TODO if path not valid, add to blocked
-        '''
 
     # actually runs dijkstras
     # returns the path
