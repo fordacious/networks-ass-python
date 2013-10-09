@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 class Topology (object):
+	# construct topology based on topology data
 	def __init__ (self, topData):
 		
 
@@ -18,5 +19,4 @@ def runLLP ():
 	pass
 
 top = Topology(getTopology())
-
 
