@@ -23,7 +23,7 @@ class Topology(object):
         return {
                 "weight"      : weight, 
                 "capacity"    : capacity,
-                "connections" : {}
+                "connections" : []
             }
 
     def add_vertex(self, value):
@@ -41,9 +41,10 @@ class Topology(object):
             } )
 
     # returns whether or not a connection path is valid with current state
-    def valid_connection_path (path):
-        #TODO
-        pass
+    def valid_connection_path (self, path):
+        if len(path) == 2:
+            return len(self.edges[(path[0], path[1])]["connections"]) < int(self.edges[(path[0], path[1])]["capacity"])
+        return len(self.edges[(path[0], path[1])]["connections"]) < int(self.edges[(path[0], path[1])]["capacity"]) and self.valid_connection_path(path[1:])
 
     # adds connections along a path
     def add_connection_path (self, path, time, time_to_live):
@@ -74,10 +75,14 @@ if __name__ == '__main__':
     '''
     print "TESTING CONNECTIONS"
     topology.clear_obsolete_connections(0)
+    print topology.valid_connection_path(['B', 'C', 'D', 'F'])
     topology.add_connection_path(['B', 'C', 'D', 'F'], 0.221267, 1.973490)
     print topology.edges[('B','C')]
     print topology.edges[('C','D')]
     print topology.edges[('D','F')]
+    for i in range(40):
+        topology.add_connection_path(['B', 'C', 'D', 'F'], 0.221267, 1.973490)
+        print topology.valid_connection_path(['B', 'C', 'D', 'F'])
     topology.clear_obsolete_connections(1.379235)
     topology.add_connection_path(['K', 'N', 'O', 'F', 'D'], 1.379235, 2.095500)
     print topology.edges[('B','C')]
@@ -103,3 +108,8 @@ if __name__ == '__main__':
     print topology.edges[('O','N')]
     print topology.edges[('C','D')]
     print topology.edges[('D','F')]
+    
+    for i in range(40):
+        topology.add_connection_path(['B', 'C', 'D', 'F'], 0.221267, 1.973490)
+        print topology.valid_connection_path(['B', 'C', 'D', 'F'])
+    topology.clear_obsolete_connections(1.379235)
