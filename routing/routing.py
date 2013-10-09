@@ -10,6 +10,9 @@ class Routing(object):
         self.topology = topology
         self.num_vc_requests = 0.0
         self.num_blocked = 0.0
+
+    def run (self):
+        pass
 	
     def output (self):
         print 'total number of virtual circuit requests: {0}'.format(self.num_vc_requests)
