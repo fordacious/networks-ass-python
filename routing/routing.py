@@ -15,13 +15,13 @@ class Routing(object):
         
         current_work_unit = workload.begin()
         while current_work_unit != None:
-
-            # TODO routing
+            
             path = self.get_path(current_work_unit)
 
             current_time = current_work_unit["time_activated"]
-            # remove active connections if need be (time + time to live is less than current time)
+
             self.topology.clear_obsolete_connections(current_time)
+
             if topology.valid_connection_path(path):
                 topology.add_connection_path(path, time, current_work_unit["time_to_live"])
             else:
