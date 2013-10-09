@@ -40,6 +40,11 @@ class Topology(object):
                 "time_to_live"    : time_to_live
             } )
 
+    # returns whether or not a connection path is valid with current state
+    def valid_connection_path (path):
+        #TODO
+        pass
+
     # adds connections along a path
     def add_connection_path (self, path, time, time_to_live):
         if len(path) == 2:

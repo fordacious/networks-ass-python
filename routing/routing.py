@@ -20,9 +20,12 @@ class Routing(object):
             path = self.get_path(current_work_unit)
 
             current_time = current_work_unit["time_activated"]
-            # TODO remove active connections if need be (time + time to live is less than current time)
-            # TODO test if path is valid 
-            # TODO add or block connection
+            # remove active connections if need be (time + time to live is less than current time)
+            self.topology.clear_obsolete_connections(current_time)
+            if topology.valid_connection_path(path):
+                topology.add_connection_path(path, time, current_work_unit["time_to_live"])
+            else:
+                self.num_blocked += 1
             
             current_work_unit = workload.next()
         
@@ -70,6 +73,8 @@ class Routing(object):
         '''
 
     # actually runs dijkstras
+    # returns the path
+    # can early exit once we have the value from the source to destination
     def get_path (self, current_work_unit):
         # TODO
         pass
