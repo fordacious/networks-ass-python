@@ -19,6 +19,7 @@ class Topology(object):
             self.add_vertex(vert_to)
             self.add_edge(vert_from, vert_to, delay, conns)
 
+    # weight = propogation delay
     def create_edge (self, weight, capacity):
         return {
                 "weight"      : weight, 
@@ -64,7 +65,6 @@ class Topology(object):
 if __name__ == '__main__':
     topology = Topology('topology.txt')
     print topology.vertices, topology.edges
-    # TODO test adding and removing connections
     '''
     0.221267 B F 0.973490
     1.379235 K D 2.095500
