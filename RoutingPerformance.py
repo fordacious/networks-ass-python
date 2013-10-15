@@ -115,10 +115,10 @@ class Routing(object):
         visited_vertices = {vert_start: 0}
         total_path = {}
         
-        candidates = self.topology.vertices
+        candidates = set(self.topology.vertices)
 
         while candidates:
-            visited = filter(lambda e: e in visited_vertices, self.topology.vertices)
+            visited = filter(lambda e: e in visited_vertices, candidates)
             visited = sorted(visited, key=lambda e: visited_vertices[e])
             minimum_vertex = visited[0] if visited else None
             if not minimum_vertex: break
@@ -138,8 +138,6 @@ class Routing(object):
         paths = self.djikstra(vert_start)
         path = [vert_end]
        
-        print vert_start, vert_end
-        print paths
         while vert_end != vert_start:
             path.append(paths[vert_end])
             vert_end = paths[vert_end]
