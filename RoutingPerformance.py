@@ -2,7 +2,6 @@
 # Benjamin James Wright <bwright@cse.unsw.edu.au>
 # Lachlan Ford
 
-
 import sys
 from collections import defaultdict
 
@@ -12,7 +11,6 @@ class Workload(object):
     '''
     def __init__(self, workload_file):
         self.work_units = []
-        self.current_index = 0
         self.parse(workload_file)
 
     def parse(self, topology_file):
@@ -25,19 +23,11 @@ class Workload(object):
                     "vert_to"        : vert_to, 
                     "time_to_live"   : time_to_live
                 })
-        self.current_index = self.work_units[0]
 
-    def begin (self):
-        self.current_index = -1
-        return self.next()
-
-    # move time, set current work unit
-    # returns None when done
-    def next (self):
-        self.current_index += 1
-        if self.current_index < len(self.work_units):
-            return self.work_units[self.current_index]
-        return None
+    def __iter__(self):
+        for e in self.work_units:
+            yield e
+         raise StopIteration
 
 class Topology(object):
     '''
@@ -78,14 +68,18 @@ class Topology(object):
                 "time_to_live"    : time_to_live
             } )
 
-    # returns whether or not a connection path is valid with current state
     def valid_connection_path (self, path):
-        if len(path) == 2:
-            return len(self.edges[(path[0], path[1])]["connections"]) < int(self.edges[(path[0], path[1])]["capacity"])
-        return len(self.edges[(path[0], path[1])]["connections"]) < int(self.edges[(path[0], path[1])]["capacity"]) and self.valid_connection_path(path[1:])
+        '''
+        Returns whether or not a connection path is valid with the current
+        state.
+        '''
+        edge = self.edges[(path[0], path[1])]
+        cons, cap = len(edge["connections"]), int(edge["capacity"])
+        if len(path) == 2: return cons < cap
+        return (cons < cap) and self.valid_connection_path(path[1:])
 
-    # adds connections along a path
     def add_connection_path (self, path, time, time_to_live):
+        ''' Adds a connection along a path '''
         if len(path) == 2:
             self.add_connection(path[0], path[1], time, time_to_live)
         else:
@@ -109,22 +103,15 @@ class Routing(object):
         self.num_blocked     = 0.0
 
     def run (self, workload):
-        
-        current_work_unit = workload.begin()
-        while current_work_unit != None:
-            
-            path = self.get_path(current_work_unit)
-
-            current_time = current_work_unit["time_activated"]
-
+        for unit in workload:
+            path = self.get_path(unit)
+            current_time = unit["time_activated"]
             self.topology.clear_obsolete_connections(current_time)
 
             if topology.valid_connection_path(path):
-                topology.add_connection_path(path, time, current_work_unit["time_to_live"])
+                topology.add_connection_path(path, time, unit["time_to_live"])
             else:
                 self.num_blocked += 1
-            
-            current_work_unit = workload.next()
 
     # actually runs dijkstras
     # returns the path
@@ -132,8 +119,8 @@ class Routing(object):
     def get_path (self, current_work_unit):
         pass
 
-    def cost (self, from_vert, to_vert ):
-        return self.topology.weights[(from_vert, to_vert)][0]
+    def cost (self, edge):
+        return self.topology.weights[edge][0]
 
     # safely prints things the way we want
     def __safeDivPrint (self, num, den = 1):
@@ -153,19 +140,34 @@ class Routing(object):
 
 
 class LeastLoadedPath(Routing):
-    # ratio of current number of active vc connections to capacity of link
-    def cost (self):
-        return (len(self.topology.connections[(from_vert, to_vert)]["connections"]) * 1.0) / self.topology.connections[(from_vert, to_vert)]["capacity"]
+    '''
+    Least Loaded Path is equivalent to the ratio of the current number of
+    active connections to the capacity of the link. We define our cost by
+    this ratio.
+    '''
+    def cost (self, edge):
+        conns = float(len(self.topology.connections[edge]["connections"]))
+        capacity = float(self.topology.connections[edge]["capacity"])
+        return conns / capacity
+
 
 class ShortestHopPath(Routing):
-    # all hops are equal cost
-    def cost (self):
+    '''
+    Shortest hop path, treats all edges of equal weight, finding the shortest
+    number of total hops. To this ends we can simply set the cost of each
+    edge to 1 and the shortest number of hops will be found.
+    '''
+    def cost (self, edge):
         return 1
 
 class ShortestDelayPath(Routing):
-    # cost if the propogation delay of the link
-    def cost (self):
-        return self.topology.connections[(from_vert, to_vert)]["weight"]
+    '''
+    Shortest Delay Path is looking at the cost of the propogation delay of
+    the link, if we simply use the defined weight of each edge we find the
+    shortest delay path.
+    '''
+    def cost (self, edge):
+        return self.topology.connections[edge]["weight"]
 
 
 def main():
