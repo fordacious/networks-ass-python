@@ -42,7 +42,7 @@ class Topology(object):
 
     def create_edge (self, weight, capacity):
         return {
-                "weight"      : weight,  # Propigation Delay
+                "weight"      : float(weight),  # Propigation Delay
                 "capacity"    : capacity,
                 "connections" : []
             }
