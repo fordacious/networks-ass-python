@@ -175,9 +175,10 @@ def main():
     algorithm_name, topology_file, workload_file = sys.argv[1:4]
     topology = Topology(topology_file)
     workload = Workload(workload_file)
-    algorithm = dispatcher[algorithm_name.upper()](topology)
 
-    algorithm.run(workload_file)
+    routing = dispatcher[algorithm_name.upper()](topology)
+    routing.run(workload_file)
+    routing.output()
 
 if __name__ == "__main__":
     main()
