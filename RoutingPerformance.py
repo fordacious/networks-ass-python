@@ -97,6 +97,7 @@ class Routing(object):
         self.num_vc_requests = 0.0
         self.num_blocked     = 0.0
         self.num_hops_avg    = 0.0
+        self.delay_avg       = 0.0
 
     def run (self, workload):
         for unit in workload:
@@ -143,7 +144,13 @@ class Routing(object):
 
         path.reverse()
         self.num_hops_avg += len(path)
-        print path
+
+        total_delay = 0.0
+        for i in xrange(0, len(path)):
+            if (i + 1) == len(path): break
+            total_delay += self.topology.edges[path[i], path[i+1]]["weight"]
+        self.delay_avg += total_delay
+
         return path
 
     def cost (self, edge):
@@ -165,7 +172,7 @@ class Routing(object):
         print 'number of blocked requests: {0}'.format(self.safe_print(self.num_blocked))
         print 'percentage of blocked requests: {0}'.format(self.safe_print((self.num_blocked * 100.0) , self.num_vc_requests))
         print 'average number of hops per circuit: {0}'.format(self.safe_print(self.num_hops_avg/self.num_vc_requests))
-        print 'average cumulative propagation delay per circuit: '
+        print 'average cumulative propagation delay per circuit: {0}'.format(self.safe_print(self.delay_avg/self.num_vc_requests))
 
 
 class LeastLoadedPath(Routing):
