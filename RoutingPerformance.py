@@ -90,7 +90,7 @@ class Topology(object):
 
 class Routing(object):
     '''
-    Base class for all routing protocls, accepts a schema, parses it.
+    Base class for all routing protocols, accepts a schema, parses it.
     '''
     def __init__(self, topology):
         self.topology        = topology
@@ -108,17 +108,46 @@ class Routing(object):
             else:
                 self.num_blocked += 1
 
-    # actually runs dijkstras
-    # returns the path
-    # can early exit once we have the value from the source to destination
-    def get_path (self, current_work_unit):
-        pass
+    def djikstra(self, vert_start):
+        visited_vertices = {vert_start: 0}
+        total_path = {}
+        
+        candidates = self.topology.vertices
+
+        while candidates:
+            visited = filter(lambda e: e in visited_vertices, self.topology.vertices)
+            visited = sorted(visited, key=lambda e: visited_vertices[e])
+            minimum_vertex = visited[0] if visited else None
+            if not minimum_vertex: break
+
+            candidates.remove(minimum_vertex)
+            visit_cost = visited_vertices[minimum_vertex]
+
+            for adjacent_vertex in self.topology.edges[minimum_vertex]:
+                cost = visit_cost + self.cost(minimum_vertex, adjacent_vertex)
+                if adjacent_vertex not in visited_vertices or cost < visited_vertices[adjacent_vertex]:
+                    visited_vertices[adjacent_vertex] = cost
+                    total_path[adjacent_vertex] = minimum_vertex
+
+        return total_path 
+
+    def get_path (self, unit):
+        vert_start, vert_end = unit['vert_from'], unit['vert_to']
+        paths = self.djikstra(vert_start)
+        path = [vert_end]
+
+        while vert_end != vert_start:
+            path.append(paths[vert_end])
+            vert_end = paths[vert_end]
+
+        path.reverse()
+        return path
 
     def cost (self, edge):
         return self.topology.weights[edge][0]
 
     # safely prints things the way we want
-    def __safeDivPrint (self, num, den = 1):
+    def safe_print (self, num, den = 1):
         if den == 0:
             return 0
         val = num / den
@@ -127,11 +156,11 @@ class Routing(object):
         return val
 
     def output (self):
-        print 'total number of virtual circuit requests: {0}'.format(self.__safeDivPrint(self.num_vc_requests))
-        print 'number of successfully routed requests: {0}'.format(self.__safeDivPrint(self.num_vc_requests - self.num_blocked))
-        print 'percentage of successfully routed request: {0}'.format(self.__safeDivPrint(((self.num_vc_requests - self.num_blocked) * 100.0) , self.num_vc_requests))
-        print 'number of blocked requests: {0}'.format(self.__safeDivPrint(self.num_blocked))
-        print 'percentage of blocked requests: {0}'.format(self.__safeDivPrint((self.num_blocked * 100.0) , self.num_vc_requests))
+        print 'total number of virtual circuit requests: {0}'.format(self.safe_print(self.num_vc_requests))
+        print 'number of successfully routed requests: {0}'.format(self.safe_print(self.num_vc_requests - self.num_blocked))
+        print 'percentage of successfully routed request: {0}'.format(self.safe_print(((self.num_vc_requests - self.num_blocked) * 100.0) , self.num_vc_requests))
+        print 'number of blocked requests: {0}'.format(self.safe_print(self.num_blocked))
+        print 'percentage of blocked requests: {0}'.format(self.safe_print((self.num_blocked * 100.0) , self.num_vc_requests))
 
 
 class LeastLoadedPath(Routing):
