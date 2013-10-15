@@ -23,6 +23,7 @@ class Workload(object):
 
     def __iter__(self):
         for e in self.work_units:
+            print e
             yield e
         raise StopIteration
 
@@ -66,6 +67,7 @@ class Topology(object):
         Returns whether or not a connection path is valid with the current
         state.
         '''
+        if path == None: return
         edge = self.edges[(path[0], path[1])]
         cons, cap = len(edge["connections"]), int(edge["capacity"])
         if len(path) == 2: return cons < cap
@@ -101,8 +103,8 @@ class Routing(object):
             current_time = unit["time_activated"]
             self.topology.clear_obsolete_connections(current_time)
 
-            if topology.valid_connection_path(path):
-                topology.add_connection_path(path, time, unit["time_to_live"])
+            if self.topology.valid_connection_path(path):
+                self.topology.add_connection_path(path, time, unit["time_to_live"])
             else:
                 self.num_blocked += 1
 
@@ -177,7 +179,7 @@ def main():
     workload = Workload(workload_file)
 
     routing = dispatcher[algorithm_name.upper()](topology)
-    routing.run(workload_file)
+    routing.run(workload)
     routing.output()
 
 if __name__ == "__main__":
