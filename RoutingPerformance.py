@@ -51,6 +51,9 @@ class Topology(object):
     def add_vertex(self, value):
         self.vertices.add(value)
 
+    def get_vertices_from(self, vertex):
+        return [k[0] for k,v in self.edges.items() if k[1] == vertex]
+
     def add_edge(self, vert_from, vert_to, weight, capacity):
         new_edge = self.create_edge(weight, capacity)
         self.edges[(vert_from, vert_to)] = new_edge
@@ -104,7 +107,7 @@ class Routing(object):
             self.topology.clear_obsolete_connections(current_time)
 
             if self.topology.valid_connection_path(path):
-                self.topology.add_connection_path(path, time, unit["time_to_live"])
+                self.topology.add_connection_path(path, current_time, unit["time_to_live"])
             else:
                 self.num_blocked += 1
 
@@ -123,24 +126,26 @@ class Routing(object):
             candidates.remove(minimum_vertex)
             visit_cost = visited_vertices[minimum_vertex]
 
-            for adjacent_vertex in self.topology.edges[minimum_vertex]:
-                cost = visit_cost + self.cost(minimum_vertex, adjacent_vertex)
+            for adjacent_vertex in self.topology.get_vertices_from(minimum_vertex):
+                cost = visit_cost + self.cost((minimum_vertex, adjacent_vertex))
                 if adjacent_vertex not in visited_vertices or cost < visited_vertices[adjacent_vertex]:
                     visited_vertices[adjacent_vertex] = cost
                     total_path[adjacent_vertex] = minimum_vertex
-
         return total_path 
 
     def get_path (self, unit):
         vert_start, vert_end = unit['vert_from'], unit['vert_to']
         paths = self.djikstra(vert_start)
         path = [vert_end]
-
+       
+        print vert_start, vert_end
+        print paths
         while vert_end != vert_start:
             path.append(paths[vert_end])
             vert_end = paths[vert_end]
 
         path.reverse()
+        print path
         return path
 
     def cost (self, edge):
