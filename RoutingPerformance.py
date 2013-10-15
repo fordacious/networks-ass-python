@@ -24,7 +24,7 @@ class Workload(object):
     def __iter__(self):
         for e in self.work_units:
             yield e
-         raise StopIteration
+        raise StopIteration
 
 class Topology(object):
     def __init__(self, topology_file):
