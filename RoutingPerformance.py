@@ -6,9 +6,6 @@ import sys
 from collections import defaultdict
 
 class Workload(object):
-    '''
-    Our datastructure that defines our workload.
-    '''
     def __init__(self, workload_file):
         self.work_units = []
         self.parse(workload_file)
@@ -30,12 +27,9 @@ class Workload(object):
          raise StopIteration
 
 class Topology(object):
-    '''
-    Our datastructure that defines our topology.
-    '''
     def __init__(self, topology_file):
         self.vertices = set()
-        self.edges    = {}
+        self.edges = {}
         self.parse(topology_file)
 
     def parse(self, topology_file):
@@ -46,10 +40,9 @@ class Topology(object):
             self.add_vertex(vert_to)
             self.add_edge(vert_from, vert_to, delay, conns)
 
-    # weight = propogation delay
     def create_edge (self, weight, capacity):
         return {
-                "weight"      : weight, 
+                "weight"      : weight,  # Propigation Delay
                 "capacity"    : capacity,
                 "connections" : []
             }
@@ -171,7 +164,20 @@ class ShortestDelayPath(Routing):
 
 
 def main():
-    return NotImplemented
+    if (len(sys.argv) < 5): return
+    
+    dispatcher = {
+            'SHP': ShortestHopPath,
+            'SDP': ShortestDelayPath,
+            'LLP': LeastLoadedPath
+    }
+
+    algorithm_name, topology_file, workload_file = sys.argv[1:4]
+    topology = Topology(topology_file)
+    workload = Workload(workload_file)
+    algorithm = dispatcher[algorithm_name.upper()](topology)
+
+    algorithm.run(workload_file)
 
 if __name__ == "__main__":
     main()
