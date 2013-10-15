@@ -125,19 +125,22 @@ class Routing(object):
         filter_lambda = lambda e: e in visited_vertices
         sorted_lambda = lambda e: visited_vertices[e]
 
+        visited = set(visited_vertices.keys())
         while candidates:
-            visited = filter(filter_lambda, candidates)
+            #visited = filter(filter_lambda, candidates)
             #visited.sort(key=sorted_lambda)
             minimum_vertex = min(visited, key=sorted_lambda) if visited else None
             if not minimum_vertex: break
 
             candidates.remove(minimum_vertex)
+            if minimum_vertex in visited: visited.remove(minimum_vertex)
             visit_cost = visited_vertices[minimum_vertex]
 
             for adjacent_vertex in self.topology.get_vertices_from(minimum_vertex):
                 cost = visit_cost + self.cost((minimum_vertex, adjacent_vertex))
                 if adjacent_vertex not in visited_vertices or cost < visited_vertices[adjacent_vertex]:
                     visited_vertices[adjacent_vertex] = cost
+                    if adjacent_vertex in candidates: visited.add(adjacent_vertex)
                     total_path[adjacent_vertex] = minimum_vertex
         return total_path 
 
