@@ -164,7 +164,7 @@ class Routing(object):
         print 'percentage of successfully routed request: {0}'.format(self.safe_print(((self.num_vc_requests - self.num_blocked) * 100.0) , self.num_vc_requests))
         print 'number of blocked requests: {0}'.format(self.safe_print(self.num_blocked))
         print 'percentage of blocked requests: {0}'.format(self.safe_print((self.num_blocked * 100.0) , self.num_vc_requests))
-        print 'average number of hops per circuit: {0}'.format(self.safe_print(self.num_hops_avg))
+        print 'average number of hops per circuit: {0}'.format(self.safe_print(self.num_hops_avg/self.num_vc_requests))
         print 'average cumulative propagation delay per circuit: '
 
 
