@@ -23,7 +23,6 @@ class Workload(object):
 
     def __iter__(self):
         for e in self.work_units:
-            print e
             yield e
         raise StopIteration
 
@@ -86,8 +85,6 @@ class Topology(object):
 
     def clear_obsolete_connections (self, cur_time):
         for ek,edge in self.edges.items():
-            # make a new list of connections with only the connections that should be active (the time has not exceeded their lifetime)
-            # TODO possible fencepost error here
             edge["connections"] = [con for con in edge["connections"] if con["activation_time"] + con["time_to_live"] > cur_time]
                 
 
@@ -99,9 +96,11 @@ class Routing(object):
         self.topology        = topology
         self.num_vc_requests = 0.0
         self.num_blocked     = 0.0
+        self.num_hops_avg    = 0.0
 
     def run (self, workload):
         for unit in workload:
+            self.num_vc_requests += 1
             path = self.get_path(unit)
             current_time = unit["time_activated"]
             self.topology.clear_obsolete_connections(current_time)
@@ -143,6 +142,7 @@ class Routing(object):
             vert_end = paths[vert_end]
 
         path.reverse()
+        self.num_hops_avg += len(path)
         print path
         return path
 
@@ -164,6 +164,8 @@ class Routing(object):
         print 'percentage of successfully routed request: {0}'.format(self.safe_print(((self.num_vc_requests - self.num_blocked) * 100.0) , self.num_vc_requests))
         print 'number of blocked requests: {0}'.format(self.safe_print(self.num_blocked))
         print 'percentage of blocked requests: {0}'.format(self.safe_print((self.num_blocked * 100.0) , self.num_vc_requests))
+        print 'average number of hops per circuit: {0}'.format(self.safe_print(self.num_hops_avg))
+        print 'average cumulative propagation delay per circuit: '
 
 
 class LeastLoadedPath(Routing):
@@ -173,8 +175,8 @@ class LeastLoadedPath(Routing):
     this ratio.
     '''
     def cost (self, edge):
-        conns = float(len(self.topology.connections[edge]["connections"]))
-        capacity = float(self.topology.connections[edge]["capacity"])
+        conns = float(len(self.topology.edges[edge]["connections"]))
+        capacity = float(self.topology.edges[edge]["capacity"])
         return conns / capacity
 
 
@@ -194,7 +196,7 @@ class ShortestDelayPath(Routing):
     shortest delay path.
     '''
     def cost (self, edge):
-        return self.topology.connections[edge]["weight"]
+        return self.topology.edges[edge]["weight"]
 
 
 def main():
