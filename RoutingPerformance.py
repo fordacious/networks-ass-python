@@ -164,7 +164,7 @@ class ShortestDelayPath(Routing):
 
 
 def main():
-    if (len(sys.argv) < 5): return
+    if (len(sys.argv) < 4): return
     
     dispatcher = {
             'SHP': ShortestHopPath,
