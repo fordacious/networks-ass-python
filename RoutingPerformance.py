@@ -31,6 +31,7 @@ class Topology(object):
         self.vertices = set()
         self.edges = {}
         self.parse(topology_file)
+        self.cache = {}
 
     def parse(self, topology_file):
         fin = open(topology_file, 'rU')
@@ -51,7 +52,10 @@ class Topology(object):
         self.vertices.add(value)
 
     def get_vertices_from(self, vertex):
-        return [k[0] for k,v in self.edges.items() if k[1] == vertex]
+        if vertex in self.cache:
+            return self.cache[vertex]
+        self.cache[vertex] =  [k[0] for k,v in self.edges.items() if k[1] == vertex]
+        return self.cache[vertex]
 
     def add_edge(self, vert_from, vert_to, weight, capacity):
         new_edge = self.create_edge(weight, capacity)
@@ -99,6 +103,7 @@ class Routing(object):
         self.num_hops_avg    = 0.0
         self.delay_avg       = 0.0
 
+
     def run (self, workload):
         for unit in workload:
             self.num_vc_requests += 1
@@ -116,11 +121,14 @@ class Routing(object):
         total_path = {}
         
         candidates = set(self.topology.vertices)
+        
+        filter_lambda = lambda e: e in visited_vertices
+        sorted_lambda = lambda e: visited_vertices[e]
 
         while candidates:
-            visited = filter(lambda e: e in visited_vertices, candidates)
-            visited = sorted(visited, key=lambda e: visited_vertices[e])
-            minimum_vertex = visited[0] if visited else None
+            visited = filter(filter_lambda, candidates)
+            #visited.sort(key=sorted_lambda)
+            minimum_vertex = min(visited, key=sorted_lambda) if visited else None
             if not minimum_vertex: break
 
             candidates.remove(minimum_vertex)
