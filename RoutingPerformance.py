@@ -150,8 +150,11 @@ class Routing(object):
         path = [vert_end]
        
         while vert_end != vert_start:
-            path.append(paths[vert_end])
-            vert_end = paths[vert_end]
+            if vert_end in paths:
+                path.append(paths[vert_end])
+                vert_end = paths[vert_end]
+            else:
+                return None
 
         path.reverse()
         self.num_hops_avg += len(path)
