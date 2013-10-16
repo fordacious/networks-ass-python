@@ -15,10 +15,10 @@ class Workload(object):
         for line in fin:
             time_activated, vert_from, vert_to, time_to_live = line.split()
             self.work_units.append({
-                    "time_activated" : time_activated, 
+                    "time_activated" : float(time_activated), 
                     "vert_from"      : vert_from, 
                     "vert_to"        : vert_to, 
-                    "time_to_live"   : time_to_live
+                    "time_to_live"   : float(time_to_live)
                 })
 
     def __iter__(self):
@@ -64,16 +64,16 @@ class Topology(object):
 
     def add_connection (self, vert_from, vert_to, time, time_to_live):
         self.edges[(vert_from, vert_to)]["connections"].append( {
-                "activation_time" : time,
-                "time_to_live"    : time_to_live
-            } )
+                "activation_time" : float(time),
+                "time_to_live"    : float(time_to_live)
+         } )
 
     def valid_connection_path (self, path):
         '''
         Returns whether or not a connection path is valid with the current
         state.
         '''
-        if path == None: return
+        if path == None: return 
         edge = self.edges[(path[0], path[1])]
         cons, cap = len(edge["connections"]), int(edge["capacity"])
         if len(path) == 2: return cons < cap
@@ -89,7 +89,7 @@ class Topology(object):
 
     def clear_obsolete_connections (self, cur_time):
         for ek,edge in self.edges.items():
-            edge["connections"] = [con for con in edge["connections"] if con["activation_time"] + con["time_to_live"] > cur_time]
+            edge["connections"] = [con for con in edge["connections"] if con["activation_time"] + con["time_to_live"] > float(cur_time)]
                 
 
 class Routing(object):
