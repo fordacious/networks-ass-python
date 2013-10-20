@@ -70,8 +70,20 @@ LLP, 5794 / 5884, 1.52957171992, 175.307613868
 
 
 ## EXPLANATION OF RESULTS ##
-TODO
+
+Graphic representation of given topology
 <img src="./figure_1.png"></img>
+
+Since all the links in the graph have the same cost in this algorithm, our implementation of always chose the first one in the list. Because of this, these links are quickly saturated which results in a large amount of blocked connections and a high amount of hops per circuit. A better way to implmement this algorithm would be to randomise the list of edges for each vertex before adding them to the open set, as this would allow more edges to be chosen and the connections to be better distributed. Vertex proximity does not ensure a lower propogation delay. As such, the average propogation delay under this algorithm is high. 
+
+The average degree of the topology is around 2. Because of this, you cant afford to only utilise 1 edge of the vertex. Because of this, Shortest Delay Path will block the most requests. It will always pick the edge with the shortest propogation delay. If both edges end up at a common vertex, the shortes propogation edge will saturated in a short amount of time and will let no more connections through. A side effect of this is that the connections that are let through will have the smallest total propogation delay possible. The smallest propogation delay does not ensure the least number of hops. If queueing + transmission + processing delay is significant, this is a very bad thing. Although this is a circuit network so its probably not that bad.
+
+Least Loaded Path will get more valid paths as it actually considers how
+loaded the paths are. Since this is the critereon by which paths are
+rejected, the algorithm avoids paths which are already saturated. This ends up allowing much more through and distributes them
+better. However, due to a wider distribution of connections, the connections
+chosen may not be optimal. This results in a larger average propogation
+delay than the other algorithms. It di result in a small number of hops per path as the paths were well distributed. This algorithm also avoids bottlenecks where the others do not.
 
 
 
